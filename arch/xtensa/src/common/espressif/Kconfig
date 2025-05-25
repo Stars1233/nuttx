@@ -135,6 +135,24 @@ config ESPRESSIF_SPIFLASH
 	depends on ARCH_CHIP_ESP32S2
 	default n
 
+config ESPRESSIF_DEDICATED_GPIO
+	bool "Dedicated GPIO"
+	depends on !ARCH_CHIP_ESP32
+	default n
+	---help---
+		Enable dedicated GPIO support for faster response time.
+		Dedicated GPIO is suitable for faster response times required
+		applications like simulate serial/parallel interfaces in a bit-banging way.
+		It can work as pin grouping and you can use any pin up to 8 pins for
+		input and 8 pins for output for dedicated gpio in total.
+
+config ESPRESSIF_DEDICATED_GPIO_IRQ
+	bool "Dedicated GPIO IRQ"
+	depends on ESPRESSIF_DEDICATED_GPIO && ARCH_CHIP_ESP32S2
+	default n
+	---help---
+		Enable dedicated GPIO IRQ support
+
 menu "Pulse Counter (PCNT) Configuration"
 	depends on ESP_PCNT
 
@@ -149,6 +167,8 @@ config ESP_PCNT_TEST_MODE
 config ESP_PCNT_AS_QE
 	bool
 	default n
+	select SENSORS
+	select SENSORS_QENCODER
 
 config ESP_PCNT_U0
 	bool "Enable PCNT Unit 0"
@@ -168,15 +188,15 @@ config ESP_PCNT_U0_CH0_EDGE_PIN
 
 config ESP_PCNT_U0_CH0_LEVEL_PIN
 	int "PCNT_U0 CH0 Level/Control Pin Number"
-	default 4 if !ESP_PCNT_U0_QE
-	default -1 if ESP_PCNT_U0_QE
+	default 4
 	range -1 39
+	depends on !ESP_PCNT_U0_QE
 
 config ESP_PCNT_U0_CH1_EDGE_PIN
 	int "PCNT_U0 CH1 Edge/Pulse Pin Number"
-	default 0 if !ESP_PCNT_U0_QE
-	default -1 if ESP_PCNT_U0_QE
+	default 0
 	range -1 39
+	depends on !ESP_PCNT_U0_QE
 
 config ESP_PCNT_U0_CH1_LEVEL_PIN
 	int "PCNT_U0 CH1 Level/Control Pin Number"
@@ -960,10 +980,10 @@ menu "Wi-Fi Configuration"
 	depends on ESPRESSIF_WIFI
 
 config ESPRESSIF_WLAN
-        bool "WLAN"
+	bool "WLAN"
 	default y
 	---help---
-	        Enable WLAN support
+		Enable WLAN support
 
 menu "ESP WPA-Supplicant"
 
@@ -1170,11 +1190,11 @@ config ESPRESSIF_ESPNOW_PKTRADIO_PANID
 		PANID for espnow pktradio.
 
 config ESPRESSIF_ESPNOW_PKTRADIO_PANADDR
-       hex "ESPNOW pktradio node address"
-       range 0x0 0xffff
-       default 0xfffe
-       ---help---
-                PANADDRESS for espnow pktradio.
+	hex "ESPNOW pktradio node address"
+	range 0x0 0xffff
+	default 0xfffe
+	---help---
+		PANADDRESS for espnow pktradio.
 
 endif #ESPRESSIF_ESPNOW_PKTRADIO
 
